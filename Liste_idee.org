@@ -1,5 +1,6 @@
 #+TITLE: Idées projet algo texte
-#+AUTHOR: Guilhèm Blanchard et Marin Julien
+#+AUTHOR: Guilhèm Blanchard et Marin Julie
+#+DATE:<2017-03-07 mar.>
 
 * Par thématique / Algo
 ** Compression
@@ -27,5 +28,4 @@
  - Automata
 *** Speech
 *** Bioinfo : DNA sequence simulation
-
-**
+*** Generation Spam (black hat)
