@@ -1,0 +1,31 @@
+#+TITLE: Idées projet algo texte
+#+AUTHOR: Guilhèm Blanchard et Marin Julien
+
+* Idées : par thématique / Algo
+** Compression
+*** lz4
+    Algo type dictionnaire.\\
+    meilleure temps de compression, pire en poids compressé
+
+** Recherche
+*** Commentz Walter
+    KMR avec différents motifs mais même complexité (prétraitement et
+    traitement)
+    grep utilise algo similaire
+*** bitap
+
+** Extraction de motifs
+
+* Idée par applications
+** Anti spam
+   Quels algos?
+   - Filtrage Bayésien : math math math math
+   - Recurrent Pattern Detection : Capture de 98%, 1faux positif sur 1million
+   -
+** Language generation algorithm
+ - Markov chains
+ - Automata
+*** Speech
+*** Bioinfo : DNA sequence simulation
+
+**
