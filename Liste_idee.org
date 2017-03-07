@@ -1,7 +1,7 @@
 #+TITLE: Idées projet algo texte
 #+AUTHOR: Guilhèm Blanchard et Marin Julien
 
-* Idées : par thématique / Algo
+* Par thématique / Algo
 ** Compression
 *** lz4
     Algo type dictionnaire.\\
@@ -16,7 +16,7 @@
 
 ** Extraction de motifs
 
-* Idée par applications
+* Par applications
 ** Anti spam
    Quels algos?
    - Filtrage Bayésien : math math math math
