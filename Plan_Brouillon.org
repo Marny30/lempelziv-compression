@@ -1,0 +1,67 @@
+#+TITLE: Brouillon plan projet
+#+AUTHOR: Guilhèm Blanchard et Marin Julien
+#+DATE: <2017-03-27 lun.>
+#+OPTIONS: toc:nil
+
+Temps: 10min
+
+Relatif à organisation appli:
+   + Une seule app avec langage glu /Quel outil voulez vous utiliser?/
+
+* Présentation
+** Introduction: compression
+*** Pourquoi? Types?
+    + Avec perte, sans perte...
+
+*** Etat de l'art
+[[https://code.facebook.com/posts/1658392934479273/smaller-and-faster-data-compression-with-zstandard/][Principaux 4 algorithmes de compression de texte]]
+
+** Lempel Ziv
+Famille d'algo, lz4
+*** Cas d'utilisation
+    - Kernel Linux
+    - Hadoop (manipulation énormement)
+    - VPN
+    - zfs
+    - ... [[http://lz4.github.io/lz4/][Entreprises/Projets utilisant lz4]]
+
+*** Présentation algo
+**** Algo
+     - Pseudocode
+**** TODO Déroulé algo
+     + Script:
+       - Entrée : texte
+       - Sortie : découpage de Lempel Ziv
+
+*** Cas limite
+    + pire cas: petit texte -> plus lourd
+    + meilleur cas: "syntagme" (/phrase/ en anglais), =motif,  courant
+
+*** Perspective : Recherche une fois compressé
+    + Refs :
+      * [[https://pdfs.semanticscholar.org/ecbc/e299ba9cabf92caafdbd88ecd6b48846535f.pdf][String Matching in LZ Compressed Strings]]
+      * [[https://arxiv.org/pdf/1104.4203.pdf][Pattern matching in Lempel-Ziv compressed strings: fast, simple, and deterministic]]
+
+** Huffman (point de comparaison) =rapidement=
+   - Graphiquement: dotty
+
+** Bibliographie
+
+* Application
+** TODO Organigramme de prog
+** TODO Déroulé algo LZ
+   - Entrée: texte
+   - Sortie: latex montrant séparation du mot
+     & dictionnaire
+     & mot codé
+** TODO Huffman dotty
+   - Entrée: texte
+   - Sortie: arbre de huffman
+     & dictionnaire
+     & mot codé
+** TODO Graphique temps de compression avec autres algo (huffman)
+   + Comparaison tps de compression
+   + Compression finale (%)
+   + Différent types données : texte, ADN, bruit aléatoire
+*** TODO Implémentation algorithmes
+** TODO Gluage de l'ensemble dans une interface
