@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-# Méthodologie
-# 1. Tokénisation
-# 2. Génération table "Search Buffer-Look Ahead"
-# 3. Encodage binaire de cette dernière
+# Methodologie
+# 1. Raw -> Codage Ziv
+# 2. Codage Ziv -> Codage Binaire pour stockage
+# 3. Codage Bin -> Décodage
 
 
 def encode(input):
@@ -34,14 +34,17 @@ def iToBin(pos, nb):
     else:
         return ''
     
-def dictToBin(compressed, dict, pretty=False):
+def dictToBin(compressed, dict, pretty=False, toByte=False):
     ''' Generation d'un format compréssé pour le code de Lempel Ziv'''
     from math import log
     aux = list()
     res = ""
+    size = 0
     for i in range(len(compressed)):
         binIndex = iToBin(i, compressed[i][0])
         aux.append((binIndex, compressed[i][1]))
+        size += len(binIndex) + 8*int(i>0)
+
     # génération de la sortie
     for i in range(len(aux)):
         if pretty:
@@ -49,7 +52,19 @@ def dictToBin(compressed, dict, pretty=False):
             if i < len(aux)-1: res += "|"
         else:
             res += aux[i][0] + aux[i][1]
-    return res
+            
+    # TODO: ajout du préfixe rendant le code multiple d'octets
+    prefix=""
+    if toByte:
+        print("size:" + str(size))
+        bitToAdd = 8-(size % 8)
+        print("to add:" + str(bitToAdd))
+        for i in range(bitToAdd, 0, -1):
+            if i==1:
+                prefix += "1"
+            else:
+                prefix += "0"
+    return prefix+res
 
 
 def decode(code):
@@ -68,8 +83,6 @@ def decode(code):
     while i in range(len(code)):
         # lecture de l'index
         toRead = int(log(nbCarLus ,2)) +1
-        # print("now reading " +str(toRead) + " chars")
-        # print("from " + code[i:])
         index = code[i:i+toRead] # index binaire
         index = int(index, 2)
         i += toRead
@@ -98,13 +111,13 @@ if __name__ == '__main__':
     import random
     length = 30
     rawString = ''.join(random.choice('ACGT') for _ in range(length))
-    # rawString = "0010111010010111011011"
+
     rawString = "AABABBBABAABABBBABBABB"
 
-    compressed, dict = encode(rawString)
+    zivcode, dict = encode(rawString)
             
-    prettycode = dictToBin(compressed, dict, True)
-    code = dictToBin(compressed, dict)
+    prettycode = dictToBin(zivcode, dict, True)
+    code = dictToBin(zivcode, dict)
 
     print("input:")
     print("\t" + rawString)
@@ -116,7 +129,7 @@ if __name__ == '__main__':
         print(str(i).rjust(3) + " | " + dict[i])
 
     print("format compressé:\n\t", end="")
-    print(*compressed)
+    print(*zivcode)
 
     print("code compressé (découpage):")
     print("\t" + prettycode)
@@ -127,8 +140,8 @@ if __name__ == '__main__':
     #calcul poids : 1 par bit, et un byte par char.
     # TODO : Gestion des char unicodes.
     weight=0
-    for i in range(len(compressed)):
-        weight+= len(iToBin(i,compressed[i][0])) + 8*int(i>0)
+    for i in range(len(zivcode)):
+        weight+= len(iToBin(i,zivcode[i][0])) + 8*int(i>0)
     print("length output (bits) : " + str(weight))
 
     res = decode(code)
