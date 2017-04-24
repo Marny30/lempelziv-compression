@@ -26,6 +26,6 @@ Fonctionnement
    en code *dot*
 3. Interprétation de ce code par les outils standards *graphviz* pour
    traduction en postscript par la commande suivante :
-``` shell
+```shell
 dot -Tps FILE.gv > FILE2.ps
 ```
