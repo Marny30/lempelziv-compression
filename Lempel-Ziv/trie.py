@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 import lz78explained
 
+HEADER = False
+FOOTER = False
+
 def readfile(path):
     global isFile
     try:
@@ -11,11 +14,14 @@ def readfile(path):
         sys.stderr.write("Couldn't open " + path +"\n")
         exit(1)
 
-def draw(rawdata, header=False, footer=False):
-    code, dico = lz78explained.encode(rawdata)
+def draw(rawdata, code, dico, cpt=-1):
     res = 'digraph trie {rankdir="TB";'
     lowestNode = [0,0] # i, profondeur
-    if header:
+    
+    if cpt==-1:
+        cpt = len(code)
+        
+    if HEADER:
         res += 'subgraph clusterheader{margin=0;style="invis"'
         res += 'HEADER [shape="box" label="Chaîne\n'+ rawdata +' "];'
         res += "}"
@@ -23,6 +29,10 @@ def draw(rawdata, header=False, footer=False):
     res += 'subgraph clusterTree{margin=0;style="invis"'
     res += str(0) + ' [label="0"];'
     for i in range(len(code)):
+        if i < cpt:
+            suffix = ""
+        else:
+            suffix = "style=invis"
         # Recherche de l'entrée la plus basse pour la lier au footer
         if len(dico[i])>lowestNode[1]:
             lowestNode = [i, len(dico[i])]
@@ -33,51 +43,86 @@ def draw(rawdata, header=False, footer=False):
             char = code[i][1]
             if char == '"': char = "''"
             elif char == "\\": char="\\\\"
-            res += '\t' +str(i+1) + ' [label="' + str(i+1) +'"]\n'
+            res += '\t' +str(i+1) + ' [label="' + str(i+1) + '"' + suffix + ']\n'
             # construction aretes
-            res += '\t' + str(code[i][0])  +"->"+ str(i+1) +' [label="'+char+'"];\n'
+            res += '\t' + str(code[i][0])  +"->"+ str(i+1) +' [label="'+char+'"'+ suffix+ '];\n'
     res += '}'
-    if footer:
+    if FOOTER:
+        # codepartiel = ' '.join(str(code[:cpt]))
+        # codepartiel = ""
+        # for i in range(cpt):
+        #     codepartiel += str(code[i])
         res += 'subgraph clusterfooter{margin=0;style="invis"'
-        res += ' FOOTER [shape="box" label="Code\n'+ str(code) +' "];}'
+        res += ' FOOTER [shape="box" label="Code\n'+ str(code[:cpt]) +' "];}'
         res += str(lowestNode[0]) + " -> FOOTER  [constraint=true style=invis weight=0]"
     res += "}"
     return res
 
-def dotToPS(input_path, output):
-    os.system('dot -Tps '+ input_path +' >' + output)
-    
+def dotToPS(inputList, output):
+    os.system('dot -Tps '+ ' '.join(inputList) +' >' + output)
+    os.system('rm '+ ' '.join(inputList))
+
+def StepbyStepWrapper(raw, header, footer, output):
+    cpt = 0
+    cpt = len(code)
+    output = outputname
+    for i in cpt:
+        graph = draw(raw, header, footer, cpt)
+        output = str(cpt) + output
+        with open(output, 'w') as f:
+            f.write(graph)
+            
 if __name__ == '__main__':
     import argparse
     import os
+    # global HEADER
+    # global FOOTER
+    cpt = -1
     p = argparse.ArgumentParser(description="Genère des Trie de  Lempel Ziv 78 Trie depuis l'entrée choisie", prog="trie.py")
-    p.add_argument('-p', '--print', action='store_true', help='non génération du graphe, arrêt à la génération du code intermédiaire')
-    p.add_argument('-f', action='store_true', dest='isfile', help='l\'input est un chemin')
     p.add_argument('-o', metavar='output', dest='output',  type=str , help='nom de la sortie')
+    p.add_argument('input', type=str, help='entrée à traiter')
+    p.add_argument('-f', action='store_true', dest='isfile', help='l\'input est un chemin')
+
+    otype=p.add_mutually_exclusive_group()
+    otype.add_argument('-p', '--print', action='store_true', help='non génération du graphe, arrêt à la génération du code intermédiaire')
+    otype.add_argument('-e', action='store_true', dest='isStepByStep', help='construction étape par étape')
     
-    p.add_argument('input', type=str, help='chemin de l\'entrée')
     args = p.parse_args()
     # print(args)
     if args.isfile:
         raw = readfile(args.input)
     else:
         raw = args.input
-    
+        HEADER = True
+        FOOTER = True
+        
     if args.output:
         output = args.output
     elif args.print:
         output = args.input + '.gv'
     else:
-        output = args.input + '.ps'
-
-    graph = draw(raw, header=(not args.isfile), footer=(not args.isfile))
-    
-    if args.print:
-        with open(output, 'w') as f:
-            f.write(graph)
-        print(graph)
+        output = args.input
+        
+    code, dico = lz78explained.encode(raw)
+    if args.isStepByStep:
+        inputs = list()
+        for i in range(len(code)):
+            current_file = 'tmp_'+str(i)+'.gv'
+            graph = draw(raw, code, dico, i)
+            inputs.append(current_file)
+            
+            with open(current_file, 'w') as f:
+                f.write(graph)
+            
+        dotToPS(inputs, output+".ps")
     else:
-        with open('tmp.gv', 'w') as f:
-            f.write(graph)
-        # générer le graphe
-        dotToPS('tmp.gv', output)
+        graph = draw(raw, code, dico)
+        if args.print:
+            with open(output, 'w') as f:
+                f.write(graph)
+            print(graph)
+        else:
+            with open('tmp.gv', 'w') as f:
+                f.write(graph)
+            # générer le graphe
+            dotToPS(['tmp.gv'], output+'.ps')
