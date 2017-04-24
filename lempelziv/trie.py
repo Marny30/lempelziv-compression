@@ -3,6 +3,7 @@ import lz78explained
 
 HEADER = False
 FOOTER = False
+NBLETTER = 0
 
 def readfile(path):
     global isFile
@@ -12,28 +13,56 @@ def readfile(path):
             return content
     except:
         sys.stderr.write("Couldn't open " + path +"\n")
-        exit(1)
+        exit(1)        
 
-def draw(rawdata, code, dico, cpt=-1):
+def countParents(code, curseur, res=1):
+    if code[curseur][0] == 0:
+        print("curseur: "+ str(curseur) + ": " + str(code[curseur]))
+        return res
+    else:
+        print(str(code[curseur]) + ": " + str(res+1))
+        return countParents(code, code[curseur][0]-1, res+1)
+
+def draw(rawdata, code, dico, nbnode=-1):
+    global NBLETTER
     res = 'digraph trie {rankdir="TB";'
     lowestNode = [0,0] # i, profondeur
+    stepbystep = True
+    if nbnode==-1:
+        nbnode = len(code)
+        stepbystep = False
+    else:
+        newletters = countParents(code, nbnode)
+        NBLETTER+= newletters
     
-    if cpt==-1:
-        cpt = len(code)
-        
     if HEADER:
-        res += 'subgraph clusterheader{margin=0;style="invis"'
-        res += 'HEADER [shape="box" label="Chaîne\n'+ rawdata +' "];'
+        res += 'subgraph clusterheader{margin=0;style="invis" '
+        # couleur partielle : 
+        # <<font> <font color="green">middle aaa</font> aaaa </font>>
+        if stepbystep:
+            # si pas premiere fois
+            print(str(NBLETTER) , str(newletters), str(len(rawdata)))
+            if NBLETTER < len(rawdata):
+                toEncode = '<font color="grey30">' + rawdata[NBLETTER:] + '</font>'
+            else:
+                toEncode = ''
+            res += 'HEADER [shape="box" label=<<font>Chaîne <br />'+\
+                   rawdata[:NBLETTER-newletters] +  '<font color="red">' +\
+                   rawdata[NBLETTER-newletters:NBLETTER] + '</font>' + toEncode +' </font>>];'
+        else:
+            res += 'HEADER [shape="box" label="Chaîne\n'+ rawdata + '"];'    
         res += "}"
         res += "HEADER -> 0  [style=invis]"
     res += 'subgraph clusterTree{margin=0;style="invis"'
     res += str(0) + ' [label="0"];'
     for i in range(len(code)):
-        if i < cpt:
+        if i <= nbnode:
             suffix = ""
         else:
             suffix = "style=invis"
-        # Recherche de l'entrée la plus basse pour la lier au footer
+        if stepbystep and i==nbnode:
+            suffix += " color=red"
+        # Recherche de l'entrée la plus basse dans le graphe pour la lier au footer
         if len(dico[i])>lowestNode[1]:
             lowestNode = [i, len(dico[i])]
 
@@ -45,36 +74,37 @@ def draw(rawdata, code, dico, cpt=-1):
             elif char == "\\": char="\\\\"
             res += '\t' +str(i+1) + ' [label="' + str(i+1) + '"' + suffix + ']\n'
             # construction aretes
-            res += '\t' + str(code[i][0])  +"->"+ str(i+1) +' [label="'+char+'"'+ suffix+ '];\n'
+            res += '\t' + str(code[i][0])  +"->"+ str(i+1) +' [label="'+char+'"'+ suffix + '];\n'
     res += '}'
     if FOOTER:
-        # codepartiel = ' '.join(str(code[:cpt]))
-        # codepartiel = ""
-        # for i in range(cpt):
-        #     codepartiel += str(code[i])
+        codepartiel = str(code[:nbnode+1])[1:-1]
         res += 'subgraph clusterfooter{margin=0;style="invis"'
-        res += ' FOOTER [shape="box" label="Code\n'+ str(code[:cpt]) +' "];}'
+        res += ' FOOTER [shape="box" label="Code\n'+ codepartiel +' "];}'
         res += str(lowestNode[0]) + " -> FOOTER  [constraint=true style=invis weight=0]"
     res += "}"
     return res
 
-def dotToPS(inputList, output):
+def dotToPS(inputList, output, cd='.'):
+    import os
     os.system('dot -Tps '+ ' '.join(inputList) +' >' + output)
+    print(inputList)
     os.system('rm '+ ' '.join(inputList))
 
-def StepbyStepWrapper(raw, header, footer, output):
-    cpt = 0
-    cpt = len(code)
-    output = outputname
-    for i in cpt:
-        graph = draw(raw, header, footer, cpt)
-        output = str(cpt) + output
-        with open(output, 'w') as f:
+def stepbyStepWrapper(raw, output):
+    code, dico = lz78explained.encode(raw)
+    inputs = list()
+    for i in range(len(code)):
+        current_file = 'tmp_'+str(i)+'.gv'
+        graph = draw(raw, code, dico, i)
+        inputs.append(current_file)
+
+        with open(current_file, 'w') as f:
             f.write(graph)
+
+    dotToPS(inputs, output+".ps")
             
 if __name__ == '__main__':
     import argparse
-    import os
     # global HEADER
     # global FOOTER
     cpt = -1
@@ -105,16 +135,7 @@ if __name__ == '__main__':
         
     code, dico = lz78explained.encode(raw)
     if args.isStepByStep:
-        inputs = list()
-        for i in range(len(code)):
-            current_file = 'tmp_'+str(i)+'.gv'
-            graph = draw(raw, code, dico, i)
-            inputs.append(current_file)
-            
-            with open(current_file, 'w') as f:
-                f.write(graph)
-            
-        dotToPS(inputs, output+".ps")
+        stepbyStepWrapper(raw, output)
     else:
         graph = draw(raw, code, dico)
         if args.print:
