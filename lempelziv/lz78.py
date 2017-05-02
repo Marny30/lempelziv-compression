@@ -25,6 +25,7 @@ def encode(input):
     # Récupération dernier mot
     if w != '':
         res.append((dico.index(w), ''))
+
     return res, dico
 
 def _iToBin(pos, nb):
@@ -86,6 +87,7 @@ def decode(zivcode):
     i = 0                       # curseur dans mot
     # lecture premier caractère
     res = ''
+    print(zivcode)
     for i in range(len(zivcode)):        
         # build prefix
         ref = zivcode[i][0]
@@ -104,32 +106,32 @@ def decode(zivcode):
         # print("new entry:" + string+ "+"+letter)
         dico.append(string + letter)
         res+= string+letter
-    # print(dico)
+    print(res)
     return res
 
 # Écrire
 def writecompressed(zivcode, path):
     from math import log
     bithandler = bitio.BitIO(path, write=True)
+    print(zivcode)
     
     if len(zivcode)>=1:
         bithandler.writeBin(ord(zivcode[0][1]), 8) # lettre
-        print('write : ' + str(ord(zivcode[0][1])))
+        # print('write : ' + str(ord(zivcode[0][1])))
 
     for i in range(1, len(zivcode)):
         length = int(log(i, 2)) +1
         bithandler.writeBin(zivcode[i][0], length)
-        print('write : ' + str(zivcode[i][0]) + ', len=' + str(length))
-        print(str(zivcode[i]) + ":" + str(length))
+        # print('write : ' + str(zivcode[i][0]) + ', len=' + str(length))
+        # print(str(zivcode[i]) + ":" + str(length))
 
         if zivcode[i][1]!='':
             bithandler.writeBin(ord(zivcode[i][1]), 8) # lettre
-            print('write : ' + str(ord(zivcode[i][1])))
+            # print('write : ' + str(ord(zivcode[i][1])))
     del bithandler
 
-
-# lis un fichier compressé depuis path et retourne le code de lempelziv
 def readcompressed(path):
+    ''' lis un fichier compressé depuis path et retourne le code de lempelziv '''
     from math import log
     bithandler = bitio.BitIO(path, write=False)    
     i=1
@@ -155,13 +157,29 @@ def readcompressed(path):
     return res
 
 def readfile(path):
-    global isFile
+    import sys
+    # res=''
+    # for i in open(path, 'r').read():
+    #     res+=i
+    # return res
     try:
-        with open(path, 'r') as f:
-            content = f.read()
-            return content
-    except:
-        sys.stderr.write("Couldn't open " + path +"\n")
+        bithandler = bitio.BitIO(path, write=False)
+        char = bithandler.read(8)
+        res = ''
+        while char!='EOF':
+            print('read: ' + str(char))
+            char = chr(char)
+            res += char
+            char = bithandler.read(8)
+
+        # with open(path, 'r') as f:
+        #     content = f.read()
+        #     return content
+
+        print(res)
+        return res
+    except Exception as e:
+        sys.stderr.write("Couldn't open " + path +": "+ str(e) +"\n")
         exit(1)        
 
 if __name__ == '__main__':
@@ -179,13 +197,17 @@ if __name__ == '__main__':
     
     args = p.parse_args()
     if args.code: suffix = ".lz"
-    else: suffix = ".txt"
+    else:
+            suffix = ""
     
     if args.isfile:
         if args.output:
             output = args.output
         else:
-            output = args.input + suffix
+            if args.isfile and args.input[-3:]=='.lz':
+                output = args.input[:-3]
+            else:
+                output = args.input + suffix
         if args.code:
             rawdata = readfile(args.input)
     else:
@@ -197,19 +219,24 @@ if __name__ == '__main__':
     else:
         zivcode = readcompressed(args.input)
 
-    if args.nobinary:
-        res = zivcode
-    else:
-        res = codeToBinString(zivcode)
-
     if not (args.printing or args.nobinary):
         if args.code:
             writecompressed(zivcode, output)
         else:
             res = decode(zivcode)
+            print(res)
+            bithandler = bitio.BitIO(output, write=True)
+            for i in res:
+                print(ord(i))
+                bithandler.writeBin(ord(i), 8)
+                
+            # with open(output, 'w') as f:
+            #     for i in res:
+                    # f.write(i)
             print("decoded: " + str(res))
             
     else:
+        res = codeToBinString(zivcode)
         print("input:")
         print("\t" + args.input)
         # print dictionnaire
