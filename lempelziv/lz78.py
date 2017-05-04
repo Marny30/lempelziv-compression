@@ -22,6 +22,7 @@ def encode(input):
             res.append((dico.index(w), letter))
             dico.append(w+letter) 
             w =""
+
     # Récupération dernier mot
     if w != '':
         res.append((dico.index(w), ''))
@@ -48,38 +49,6 @@ def codeToBinString(code):
         size += len(binIndex) + 8*int(i>0)
     return res, size
 
-def dictToBin(code, dict, pretty=False, toByte=False):
-    ''' Generation d'un format compréssé pour le code de Lempel Ziv'''
-    from math import log
-    aux = list()
-    res = ""
-    size = 0
-    for i in range(len(code)):
-        binIndex = iToBin(i, code[i][0])
-        aux.append((binIndex, code[i][1]))
-        size += len(binIndex) + 8*int(i>0)
-
-    # génération de la sortie
-    for i in range(len(aux)):
-        if pretty:
-            res+= aux[i][0] + "," + aux[i][1]
-            if i < len(aux)-1: res += "|"
-        else:
-            res += aux[i][0] + aux[i][1]
-            
-    # TODO: ajout du préfixe rendant le code multiple d'octets
-    prefix=""
-    if toByte:
-        print("size:" + str(size))
-        bitToAdd = 8-(size % 8)
-        print("to add:" + str(bitToAdd))
-        for i in range(bitToAdd, 0, -1):
-            if i==1:
-                prefix += "1"
-            else:
-                prefix += "0"
-    return prefix+res
-
 def decode(zivcode):
     from math import log
     dico = ['']
@@ -92,7 +61,6 @@ def decode(zivcode):
         # build prefix
         ref = zivcode[i][0]
         letter = zivcode[i][1]
-        # print("reading" + str(zivcode[i]))
         if ref==0:
             string = ""
         else:
@@ -103,7 +71,6 @@ def decode(zivcode):
             res+=string
             break;
         # read a char
-        # print("new entry:" + string+ "+"+letter)
         dico.append(string + letter)
         res+= string+letter
     print(res)
@@ -117,17 +84,13 @@ def writecompressed(zivcode, path):
     
     if len(zivcode)>=1:
         bithandler.writeBin(ord(zivcode[0][1]), 8) # lettre
-        # print('write : ' + str(ord(zivcode[0][1])))
 
     for i in range(1, len(zivcode)):
         length = int(log(i, 2)) +1
+        print(length)
         bithandler.writeBin(zivcode[i][0], length)
-        # print('write : ' + str(zivcode[i][0]) + ', len=' + str(length))
-        # print(str(zivcode[i]) + ":" + str(length))
-
         if zivcode[i][1]!='':
             bithandler.writeBin(ord(zivcode[i][1]), 8) # lettre
-            # print('write : ' + str(ord(zivcode[i][1])))
     del bithandler
 
 def readcompressed(path):
@@ -143,7 +106,6 @@ def readcompressed(path):
             break
         else:
             char = chr(char)
-            # print('read {' + str(ref) + "," + str(char) + "} updating dict.")
         res.append((ref, char))        
         length = int(log(i, 2)) +1
         ref = bithandler.read(length)
@@ -151,32 +113,21 @@ def readcompressed(path):
         i+=1
     # Si il y a encore à écrire (référence existante, mais pas char)
     if ref!='EOF' and ref!=0 and char=='EOF':
-        # print('reading last byte')
-        # print('read {' + str(ref) + ", ''} updating dict.")
         res.append((ref,''))
     return res
 
 def readfile(path):
     import sys
-    # res=''
-    # for i in open(path, 'r').read():
-    #     res+=i
-    # return res
+
     try:
         bithandler = bitio.BitIO(path, write=False)
         char = bithandler.read(8)
         res = ''
         while char!='EOF':
-            print('read: ' + str(char))
+            # print('read: ' + str(char))
             char = chr(char)
             res += char
             char = bithandler.read(8)
-
-        # with open(path, 'r') as f:
-        #     content = f.read()
-        #     return content
-
-        print(res)
         return res
     except Exception as e:
         sys.stderr.write("Couldn't open " + path +": "+ str(e) +"\n")
@@ -196,7 +147,7 @@ if __name__ == '__main__':
     p.add_argument('-p', '--print', action='store_true', dest='printing', help='affchage dans terminal. exclut l\'écriture dans fichier.')
     
     args = p.parse_args()
-    if args.code: suffix = ".lz"
+    if args.code: suffix = ".lz78"
     else:
             suffix = ""
     
@@ -204,23 +155,28 @@ if __name__ == '__main__':
         if args.output:
             output = args.output
         else:
-            if args.isfile and args.input[-3:]=='.lz':
-                output = args.input[:-3]
+            if args.isfile and args.input[-5:]=='.lz78':
+                output = args.input[:-5]
             else:
                 output = args.input + suffix
         if args.code:
+            print("reading input file..")
             rawdata = readfile(args.input)
     else:
         output="out" +suffix
         rawdata = args.input
 
     if args.code:
+        print("encoding..")
         zivcode, dict = encode(rawdata)
     else:
+        print("reading compressed file..")
         zivcode = readcompressed(args.input)
 
+    
     if not (args.printing or args.nobinary):
         if args.code:
+            print("writing compressed file..")
             writecompressed(zivcode, output)
         else:
             res = decode(zivcode)
@@ -229,10 +185,6 @@ if __name__ == '__main__':
             for i in res:
                 print(ord(i))
                 bithandler.writeBin(ord(i), 8)
-                
-            # with open(output, 'w') as f:
-            #     for i in res:
-                    # f.write(i)
             print("decoded: " + str(res))
             
     else:
