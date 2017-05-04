@@ -56,7 +56,6 @@ def decode(zivcode):
     i = 0                       # curseur dans mot
     # lecture premier caractère
     res = ''
-    print(zivcode)
     for i in range(len(zivcode)):        
         # build prefix
         ref = zivcode[i][0]
@@ -73,21 +72,19 @@ def decode(zivcode):
         # read a char
         dico.append(string + letter)
         res+= string+letter
-    print(res)
     return res
 
 # Écrire
 def writecompressed(zivcode, path):
     from math import log
-    bithandler = bitio.BitIO(path, write=True)
-    print(zivcode)
+    bithandler = bitio.BitIO(path, write=True)    
     
     if len(zivcode)>=1:
         bithandler.writeBin(ord(zivcode[0][1]), 8) # lettre
 
     for i in range(1, len(zivcode)):
         length = int(log(i, 2)) +1
-        print(length)
+        
         bithandler.writeBin(zivcode[i][0], length)
         if zivcode[i][1]!='':
             bithandler.writeBin(ord(zivcode[i][1]), 8) # lettre
@@ -138,33 +135,31 @@ if __name__ == '__main__':
     
     p = argparse.ArgumentParser(description="Compression de lempel ziv78", prog="lz78.py")
     action=p.add_mutually_exclusive_group(required = True)
-    action.add_argument('-c', action='store_true', dest='code', help='codage de données brutes')
+    action.add_argument('-c', action='store_true', dest='code', help='compression de données brutes')
     action.add_argument('-d', action='store_true', dest='decode', help='décompression de fichier compressé')
-    p.add_argument('-o', metavar='output', dest='output',  type=str , help='nom de la sortie')
     p.add_argument('input', type=str, help='entrée à traiter')
-    p.add_argument('-f', action='store_true', dest='isfile', help='l\'input est un chemin')
-    p.add_argument('--nobin', action='store_true', dest='nobinary', help='utiliser un codage numérique. implique -p.')
-    p.add_argument('-p', '--print', action='store_true', dest='printing', help='affchage dans terminal. exclut l\'écriture dans fichier.')
+    p.add_argument('-s', action='store_true', dest='isString',
+                   help='l\'input est une chaîne et non un chemin')
+    p.add_argument('-p', '--print', action='store_true',
+                   dest='printing', help='affichage des étapes de transformation dans le terminal. exclut l\'écriture dans fichier.')
+    p.add_argument('-o', metavar='output', dest='output',  type=str , help='nom de la sortie')
     
     args = p.parse_args()
     if args.code: suffix = ".lz78"
-    else:
-            suffix = ""
-    
-    if args.isfile:
-        if args.output:
-            output = args.output
-        else:
-            if args.isfile and args.input[-5:]=='.lz78':
-                output = args.input[:-5]
-            else:
-                output = args.input + suffix
-        if args.code:
-            print("reading input file..")
-            rawdata = readfile(args.input)
-    else:
+    else: suffix = ""
+
+    if args.output:
+        output = args.output
+    elif args.isString:
         output="out" +suffix
+    elif args.decode and args.input[-5:]=='.lz78':
+        output = args.input[:-5]
+        
+    if args.isString:
         rawdata = args.input
+    elif args.code:
+        print("reading input file..")
+        rawdata = readfile(args.input)
 
     if args.code:
         print("encoding..")
@@ -172,21 +167,18 @@ if __name__ == '__main__':
     else:
         print("reading compressed file..")
         zivcode = readcompressed(args.input)
-
     
-    if not (args.printing or args.nobinary):
+    if not (args.printing):
         if args.code:
             print("writing compressed file..")
             writecompressed(zivcode, output)
+            print("ok")
         else:
             res = decode(zivcode)
-            print(res)
             bithandler = bitio.BitIO(output, write=True)
             for i in res:
-                print(ord(i))
                 bithandler.writeBin(ord(i), 8)
-            print("decoded: " + str(res))
-            
+            print("decoded: " + res)
     else:
         res = codeToBinString(zivcode)
         print("input:")
@@ -196,7 +188,7 @@ if __name__ == '__main__':
         print(" --------------")
         for i in range(len(dict)):
             print(str(i).rjust(3) + " | " + dict[i])
-        print("Code de lempel-ziv:\n\t", end="")
+        print("Code de lempel-ziv:  (ref, lettre)\n\t", end="")
         print(*zivcode)
         print("format compressé:\n\t", end="")
         print(*res[0])
