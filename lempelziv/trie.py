@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import lz78explained
+import lz78
 
 HEADER = False
 FOOTER = False
@@ -17,17 +17,18 @@ def readfile(path):
 
 def countParents(code, curseur, res=1):
     if code[curseur][0] == 0:
-        print("curseur: "+ str(curseur) + ": " + str(code[curseur]))
+        # print("curseur: "+ str(curseur) + ": " + str(code[curseur]))
         return res
     else:
-        print(str(code[curseur]) + ": " + str(res+1))
+        # print(str(code[curseur]) + ": " + str(res+1))
         return countParents(code, code[curseur][0]-1, res+1)
 
-def draw(rawdata, code, dico, nbnode=-1):
+def draw(rawdata, code, nbnode=-1):
     global NBLETTER
     res = 'digraph trie {rankdir="TB";'
     lowestNode = [0,0] # i, profondeur
     stepbystep = True
+    dico = lz78.dico
     if nbnode==-1:
         nbnode = len(code)
         stepbystep = False
@@ -37,11 +38,9 @@ def draw(rawdata, code, dico, nbnode=-1):
     
     if HEADER:
         res += 'subgraph clusterheader{margin=0;style="invis" '
-        # couleur partielle : 
-        # <<font> <font color="green">middle aaa</font> aaaa </font>>
         if stepbystep:
             # si pas premiere fois
-            print(str(NBLETTER) , str(newletters), str(len(rawdata)))
+            # print(str(NBLETTER) , str(newletters), str(len(rawdata)))
             if NBLETTER < len(rawdata):
                 toEncode = '<font color="grey30">' + rawdata[NBLETTER:] + '</font>'
             else:
@@ -90,18 +89,15 @@ def dotToPS(inputList, output, cd='.'):
     print(inputList)
     os.system('rm '+ ' '.join(inputList))
 
-def stepbyStepWrapper(raw, output):
-    code, dico = lz78explained.encode(raw)
+def stepbyStepWrapper(raw, code, output):
     inputs = list()
     for i in range(len(code)):
         current_file = 'tmp_'+str(i)+'.gv'
-        graph = draw(raw, code, dico, i)
+        graph = draw(raw, code, i)
         inputs.append(current_file)
-
         with open(current_file, 'w') as f:
             f.write(graph)
-
-    dotToPS(inputs, output+".ps")
+    dotToPS(inputs, output)
             
 if __name__ == '__main__':
     import argparse
@@ -131,13 +127,14 @@ if __name__ == '__main__':
     elif args.print:
         output = args.input + '.gv'
     else:
-        output = args.input
+        output = args.input + '.ps'
         
-    code, dico = lz78explained.encode(raw)
+    code, dico = lz78.encode(raw)
+    print(code)
     if args.isStepByStep:
-        stepbyStepWrapper(raw, output)
+        stepbyStepWrapper(raw, code, output)
     else:
-        graph = draw(raw, code, dico)
+        graph = draw(raw, code)
         if args.print:
             with open(output, 'w') as f:
                 f.write(graph)
@@ -146,4 +143,4 @@ if __name__ == '__main__':
             with open('tmp.gv', 'w') as f:
                 f.write(graph)
             # générer le graphe
-            dotToPS(['tmp.gv'], output+'.ps')
+            dotToPS(['tmp.gv'], output)
