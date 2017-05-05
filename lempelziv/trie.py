@@ -17,18 +17,18 @@ def readfile(path):
 
 def countParents(code, curseur, res=1):
     if code[curseur][0] == 0:
-        # print("curseur: "+ str(curseur) + ": " + str(code[curseur]))
+        print("curseur: "+ str(curseur) + ": " + str(code[curseur]))
         return res
     else:
-        # print(str(code[curseur]) + ": " + str(res+1))
+        print(str(code[curseur]) + ": " + str(res+1))
         return countParents(code, code[curseur][0]-1, res+1)
 
-def draw(rawdata, code, nbnode=-1):
+def draw(rawdata, code, dico, nbnode=-1):
     global NBLETTER
     res = 'digraph trie {rankdir="TB";'
     lowestNode = [0,0] # i, profondeur
     stepbystep = True
-    dico = lz78.dico
+    print("dico:"  +str(dico))
     if nbnode==-1:
         nbnode = len(code)
         stepbystep = False
@@ -89,11 +89,11 @@ def dotToPS(inputList, output, cd='.'):
     print(inputList)
     os.system('rm '+ ' '.join(inputList))
 
-def stepbyStepWrapper(raw, code, output):
+def stepbyStepWrapper(raw, code, dico, output):
     inputs = list()
     for i in range(len(code)):
         current_file = 'tmp_'+str(i)+'.gv'
-        graph = draw(raw, code, i)
+        graph = draw(raw, code, dico, i)
         inputs.append(current_file)
         with open(current_file, 'w') as f:
             f.write(graph)
@@ -132,9 +132,9 @@ if __name__ == '__main__':
     code, dico = lz78.encode(raw)
     print(code)
     if args.isStepByStep:
-        stepbyStepWrapper(raw, code, output)
+        stepbyStepWrapper(raw, code, dico, output)
     else:
-        graph = draw(raw, code)
+        graph = draw(raw, dico, code)
         if args.print:
             with open(output, 'w') as f:
                 f.write(graph)

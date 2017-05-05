@@ -13,6 +13,7 @@ def encode(input):
     global dico
     w = ""
     res= list()
+    dico = list('')
     dico.append('')
     for i in range(len(input)):
         letter = input[i]
@@ -42,7 +43,7 @@ def _iToBin(pos, nb):
 def codeToBinString(code):
     ''' Écriture en string du code ziv. pour print '''
     res = list()
-    size = 0
+    size = 8
     for i in range(len(code)):
         binIndex = _iToBin(i, code[i][0])
         res.append((binIndex, code[i][1]))
