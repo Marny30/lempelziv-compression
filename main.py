@@ -34,7 +34,7 @@ class App():
         self.sousmenu(retour=False)
         
     def huffman(self):
-        h = HuffApp()g
+        h = HuffApp()
         print("TODO: HUFF APP")
     
     def lempelziv(self):
@@ -44,7 +44,7 @@ class App():
         Button(self.frame, text="LZ78 : codage pas à pas", command=self.lempelzivTrie).grid(column=0, columnspan=2,  row=0, pady=5)
         Button(self.frame, text="LZ78 : compression", command=self.compression).grid(column=0, columnspan=2,  row=1, pady=5)
         Button(self.frame, text="LZ77", command=self.lz77).grid(column=0, columnspan=2, row=2, pady=5)
-        Button(self.frame, text="Galaxie Lempel Ziv", command=self.famille).grid(column=0, columnspan=2, row=3, pady=5)
+        Button(self.frame, text="Famille Lempel Ziv", command=self.famille).grid(column=0, columnspan=2, row=3, pady=5)
         self.sousmenu()
 
     def lempelzivTrie(self):
@@ -58,6 +58,7 @@ class App():
         pass
 
     def famille(self):
+        import os
         os.system('exo-open lempelziv/famille/famille.png')
     
     def comparaison(self):
