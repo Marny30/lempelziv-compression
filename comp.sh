@@ -21,9 +21,9 @@ BZIP2=$(./comp.py $MyBZIP2)
 ZIP=$(./comp.py $MyZIP)
 
 echo "\addplot coordinates{(1,"$LZMA")(2,"$XZ")(3,"$BZIP2")(4,"$ZIP")(5,0.025)};"
-
 echo "\end{axis}"
 echo "\end{tikzpicture}"
+echo $1
 echo "\end{document}"
 
 
