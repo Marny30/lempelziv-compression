@@ -22,11 +22,11 @@ ZIP=$(./comp.py $MyZIP)
 
 echo "\addplot coordinates{(1,"$LZMA")(2,"$XZ")(3,"$BZIP2")(4,"$ZIP")(5,0)};"
 
-SizeLZMA=$(ls projet/ -al|grep $1.LZ.lzma|cut -d " " -f5)
-SizeXZ=$(ls projet/ -al|grep $1.XZ.xz|cut -d " " -f5)
-SizeBZIP2=$(ls projet/ -al|grep $1.BZ.bz2|cut -d " " -f5)
-SizeZIP=$(ls projet/ -al|grep $1.ZIP.zip|cut -d " " -f5)
-echo "\addplot coordinates{(1,"$SizeLZMA")(2,"$SizeXZ")(3,"$SizeBZIP2")(4,"$SizeZIP")(5,0)};"
+#SizeLZMA=$(ls projet/ -al|grep $1.LZ.lzma|cut -d " " -f5)
+#SizeXZ=$(ls projet/ -al|grep $1.XZ.xz|cut -d " " -f5)
+#SizeBZIP2=$(ls projet/ -al|grep $1.BZ.bz2|cut -d " " -f5)
+#SizeZIP=$(ls projet/ -al|grep $1.ZIP.zip|cut -d " " -f5)
+#echo "\addplot coordinates{(1,"$SizeLZMA")(2,"$SizeXZ")(3,"$SizeBZIP2")(4,"$SizeZIP")(5,0)};"
 
 echo "\end{axis}"
 echo "\end{tikzpicture}"
