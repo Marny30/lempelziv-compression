@@ -1,0 +1,24 @@
+digraph g {
+        labelloc=top;
+        node [shape="record"];
+        
+        label="Famille des algorithmes de Lempel Ziv";
+        
+        LZW [label="{LZW|PKZip (1989)}"];
+        DEFLATE [shape="record", label="{DEFLATE|GZip/Winzip (1992)}"];
+        LZSS [label="{LZSS|RAR (1993)}"];
+        LZMA [label="{LZMA|7Zip (1999)}"];
+        LZ4 [label="{LZ4|MySQL\nnVidia\nNoyau Linux\n...}"]
+        
+        
+        {rank = same; LZ78; LZ77;}
+        {rank = same; LZW; DEFLATE; LZSS; LZMA; LZ4}
+        LZ78 -> LZ77 [style="invis"];
+        
+        LZ77 -> LZ78;
+        LZ77 -> LZSS;
+        LZ77 -> DEFLATE;
+        LZ77 -> LZMA;
+        LZ77 -> LZ4;
+        LZ78 -> LZW;
+}
