@@ -1,5 +1,5 @@
 CC		= @gcc
-FLAGS		= -Wall -pedantic -std=c99 -g # -ANSI -pedantic
+FLAGS		= -Wall -pedantic -std=c99 -g -pedantic # -ANSI
 LIBS		=
 
 PROGNAME	= huffman
@@ -25,7 +25,7 @@ archive: $(ARCH_SRC)
 .PHONY: clean arch archive debug
 
 clean:
-	$(MSG) "Suppressing generated files..."
+	$(MSG) "Deleting generated files..."
 	$(RM) *~ *.o $(PROGNAME)
 	$(RM) $(ARCH) $(ARCH_SRC)
 	$(RM) core

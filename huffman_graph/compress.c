@@ -32,13 +32,16 @@ int compressMain(const char* pathinput){
 
   for(int i=0; i<256; i++){ dico[i] = NULL; }
   huffnode node[nbChar*2];
-  hufftree *tree = &node[nbChar*2];
+  hufftree *tree = &node[nbChar*2-2];
+  /* printf("%d, %c\n", occ[255].probability, occ[255].letter); */
+
   sort(&occ);
   makeHuffmanTree(nbChar, &node, occ);
   genCode(tree, dico, "");
+
   compress(fi, fo, fodict, dico, nbChar);
   
-  for (int i=0; i<nbChar*2-2; i++){
+  for (int i=0; i<nbChar*2-2 && i<256; i++){
     free(node[i].code);
     if (dico[i]!=NULL) { free(dico[i]); }
   }
@@ -68,11 +71,10 @@ void sort(occurence (*res)[256]){
     (*res)[i].letter = (*res)[min].letter;
     (*res)[min].letter = auxchar;
   }
-
 }
 
 int readOccurence(occurence (*res)[256], FILE* f){ 
-  char aux;
+  int aux;                      /* pour fichiers binaire pour distinguer le char n°255 de EOF */
   unsigned int nbChar = 0;
   /* init */ 
   for (int i=0; i<256; i++){
@@ -80,7 +82,7 @@ int readOccurence(occurence (*res)[256], FILE* f){
     (*res)[i].probability = 0;
   }
   /* parcours du fichier pour création table */
-  while ((aux=fgetc(f)) != EOF){ /* 255 = EOF en unsigned */
+  while ((aux=fgetc(f)) != EOF){
     if (!(*res)[(unsigned char)aux].probability)
       nbChar++;
     (*res)[(unsigned char) aux].probability++;
@@ -138,6 +140,7 @@ void genCode(huffnode *tree, char* dico[256], const char* parentCode){
     /* si feuille */
     dico[(*tree).letter] = (char*) malloc(strlen(parentCode)+1);
     strcat(dico[(*tree).letter], parentCode);
+    /* printf("string %d generated :%s\n", (*tree).letter, parentCode); */
   }
   else {
     (*tree).left->code = (char*) malloc(strlen(parentCode)+1);
@@ -161,7 +164,7 @@ void genCode(huffnode *tree, char* dico[256], const char* parentCode){
 }
 
 void compress(FILE* fi, FILE* fo, FILE* fodict, char* dico[256], const int nbChar){
-  char aux;
+  int aux;           /* int pour même raison que dans readOccurence */
   /* TODO */
   /* int bits = 0; */
   /* char byte=0; */
@@ -172,16 +175,17 @@ void compress(FILE* fi, FILE* fo, FILE* fodict, char* dico[256], const int nbCha
     if (dico[i]!=0){
       fprintf(fodict, "%c:%s\n", i, dico[i]);
       codelength[i] = strlen(dico[i]);
-      /* printf("len %c : %d\n",i, strlen(dico[i])); */
+      /* printf("len %c,%d : %d\n",i,i, strlen(dico[i])); */
     }
     else
       codelength[i] = 0;
   }
   /* écrire contenu */
-  while ((aux=fgetc(fi)) != EOF){
-    for (int i=0; i < codelength[(int) aux]; i++){
-      printf("%c", dico[(int) aux][i]);
+  while (( aux= fgetc(fi)) != EOF){
+    /* printf("letter: %c, %d\ncode:", aux, aux); */
+    for (int i=0; i < codelength[aux]; i++){
+      /* printf("%c", dico[aux][i]); */
     }
-    fprintf(fo,"%s", dico[(int) aux]);
+    fprintf(fo,"%s", dico[aux]);
   }
 }

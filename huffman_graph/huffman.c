@@ -19,6 +19,7 @@ int main(int argc, char* argv[]){
 
   if (!strcmp(argv[1],"-c")){
     compressMain(argv[2]);
+    printf("ECRITURE BIT PAR BIT TODO");
   }
   else if (!strcmp(argv[1],"-g")){
     graph(argv[2]);
@@ -28,6 +29,7 @@ int main(int argc, char* argv[]){
   }
   else{
     help();
+    return 1;
   }
   return 0;
 }
