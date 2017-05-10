@@ -86,8 +86,9 @@ def draw(rawdata, code, dico, nbnode=-1):
 def dotToPS(inputList, output, cd='.'):
     import os
     os.system('dot -Tps '+ ' '.join(inputList) +' >' + output)
-    print(inputList)
-    os.system('rm '+ ' '.join(inputList))
+    # print(inputList)
+    for i in inputList:
+        os.remove(i)
 
 def stepbyStepWrapper(raw, code, dico, output):
     inputs = list()
@@ -101,8 +102,6 @@ def stepbyStepWrapper(raw, code, dico, output):
             
 if __name__ == '__main__':
     import argparse
-    # global HEADER
-    # global FOOTER
     cpt = -1
     p = argparse.ArgumentParser(description="Genère des Trie de  Lempel Ziv 78 Trie depuis l'entrée choisie", prog="trie.py")
     p.add_argument('-o', metavar='output', dest='output',  type=str , help='nom de la sortie')
