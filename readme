@@ -1,0 +1,10 @@
+Fonctionnement du comparateur
+Le script principal comp.sh genere la base du code latex
+le script comp.py utilise une expretion regulière et un calcul pour donner le temps d execution en secondess
+ce resultat est inclut dans le latex
+les different code sont coupe avec la focntion split, pluis compile en pdf
+les pdf sont assemble avec le programe pdftk
+les fichier temporaires sont suprimé
+il s'exécute avec 'make' et compare le contenu du dossier 'projet'
+pour le moment, la compraison se base sur la duré d'exécution, le taux de comparaison est en cours d'ilmplementation
+
