@@ -2,8 +2,9 @@ Introduction à Lempel Ziv
 ===============================
 Auteurs : Guilhèm BLANCHARD, Marin JULIEN
 
-Ce programme présente le fonctionnement des algorithmes de Lempel Ziv,
-qui reste la famille de compression de texte la plus efficace de nos
+Ce programme présente au travers d'une interface graphique le
+fonctionnement des algorithmes de Lempel Ziv, qui reste la famille
+d'algorithmes de compression de texte la plus efficace de nos
 jours. Le projet se base sur plusieurs sous-programmes que nous avons
 écrits.
 
