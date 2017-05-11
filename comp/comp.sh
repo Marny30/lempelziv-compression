@@ -9,7 +9,7 @@ echo "\usepackage{tikz}"
 echo "\usepackage{pgfplots}"
 echo "\begin{document}"
 echo "\begin{tikzpicture}[scale=0.7]"
-echo "\begin{axis}[ybar,xticklabels={0,0,lzma,xz,bzip2,zip,huffman}]"
+echo "\begin{axis}[ybar,xticklabels={0,0,lzma,xz,zip,bzip2,huffman}]"
 
 MyLZMA=$({ time lzma -z ./projet/$1.LZ; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyXZ=$({ time xz -z ./projet/$1.XZ; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
@@ -23,7 +23,7 @@ BZIP2=$(./comp.py $MyBZIP2)
 ZIP=$(./comp.py $MyZIP)
 HUFF=$(./comp.py $MyHUFF)
 
-echo "\addplot coordinates{(1,"$LZMA")(2,"$XZ")(3,"$BZIP2")(4,"$ZIP")(5,"$HUFF")};"
+echo "\addplot coordinates{(1,"$LZMA")(2,"$XZ")(4,"$BZIP2")(3,"$ZIP")(5,"$HUFF")};"
 
 #SizeLZMA=$(ls projet/ -al|grep $1.LZ.lzma|cut -d " " -f5)
 #SizeXZ=$(ls projet/ -al|grep $1.XZ.xz|cut -d " " -f5)
@@ -49,8 +49,8 @@ HUFF=$(./comp.py $MyunHUFF)
 echo "\end{axis}"
 echo "\end{tikzpicture}"
 echo "\begin{tikzpicture}[scale=0.7]"
-echo "\begin{axis}[ybar,xticklabels={0,0,lzma,xz,bzip2,zip,huffman}]"
-echo "\addplot coordinates{(1,"$LZMA")(2,"$XZ")(3,"$BZIP2")(4,"$ZIP")(5,"$HUFF")};"
+echo "\begin{axis}[ybar,xticklabels={0,0,lzma,xz,zip,bzip2,huffman}]"
+echo "\addplot coordinates{(1,"$LZMA")(2,"$XZ")(4,"$BZIP2")(3,"$ZIP")(5,"$HUFF")};"
 echo "\end{axis}"
 echo "\end{tikzpicture}"
 echo "temps de compression et de decompression de "$1"en secondes "
