@@ -35,7 +35,6 @@ class App():
         
     def huffman(self):
         h = HuffApp()
-        print("TODO: HUFF APP")
     
     def lempelziv(self):
         self.frame.destroy()
@@ -58,8 +57,8 @@ class App():
         pass
 
     def famille(self):
-        import os
-        os.system('exo-open lempelziv/famille/famille.png')
+        import webbrowser
+        webbrowser.open('exo-open lempelziv/famille/famille.png')
     
     def comparaison(self):
         print("TODO: Comparison")
