@@ -57,4 +57,4 @@ echo "\\\\ temps de compression et de decompression de "$1" en secondes "
 echo "\end{document}"
 
 
-# rm ./projet/*.lzma ./projet/*.xz ./projet/*.bz2 ./projet/*ZIP* ./projet/*HUFF* ./projet/*BZ* ./projet/*LZ* ./projet/*XZ* 
+rm ./projet/*.lzma ./projet/*.xz ./projet/*.bz2 ./projet/*ZIP* ./projet/*HUFF* ./projet/*BZ* ./projet/*LZ* ./projet/*XZ* 
