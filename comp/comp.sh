@@ -15,7 +15,7 @@ MyLZMA=$({ time lzma -z ./projet/$1.LZ; } 2>&1 | grep real| sed -e 's/real\t//'|
 MyXZ=$({ time xz -z ./projet/$1.XZ; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyBZIP2=$({ time  bzip2 -z ./projet/$1.BZ; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyZIP=$({ time  zip -q -r ./projet/$1.ZIP.zip ./projet/$1.ZIP; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
-MyHUFF=$({ time ./huff/huf ./projet/$i.HUFF ./projet/$1.HUFF.huff; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
+MyHUFF=$({ time ./huffman-extern/huffcode -c -i ./projet/$i.HUFF -o ./projet/$1.HUFF.huff; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 
 LZMA=$(./comp.py $MyLZMA)
 XZ=$(./comp.py $MyXZ)
@@ -36,7 +36,7 @@ MyunLZMA=$({ time lzma -d ./projet/$1.LZ.lzma; } 2>&1 | grep real| sed -e 's/rea
 MyunXZ=$({ time xz -d ./projet/$1.XZ.xz; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyunBZIP2=$({ time  bzip2 -d ./projet/$1.BZ.bz2; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyunZIP=$({ time  zip -r ./projet/$1.ZIP ./projet/$1.ZIP.zip; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
-MyunHUFF=$({ time ./huff/dehuf ./projet/$i.HUFF ./projet/$1.HUFF.huff; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
+MyunHUFF=$({ time ./huffman-extern/huffcode -c -i ./projet/$i.HUFF -o ./projet/$1.HUFF.huff; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 
 LZMA=$(./comp.py $MyunLZMA)
 XZ=$(./comp.py $MyunXZ)
