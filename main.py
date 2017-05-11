@@ -61,8 +61,8 @@ class App():
         webbrowser.open('lempelziv/famille/famille.png')
     
     def comparaison(self):
-        print("TODO: Comparison")
-        pass
+        import webbrowser
+        webbrowser.open('comp/final.pdf')
     
 def main():
     root = Tk()
