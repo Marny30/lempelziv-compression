@@ -53,7 +53,8 @@ echo "\begin{axis}[ybar,xticklabels={0,0,lzma,xz,bzip2,zip,huffman}]"
 echo "\addplot coordinates{(1,"$LZMA")(2,"$XZ")(3,"$BZIP2")(4,"$ZIP")(5,"$HUFF")};"
 echo "\end{axis}"
 echo "\end{tikzpicture}"
+echo "temps de compression et de decompression de "$1"en secondes "
 echo "\end{document}"
 
 
-rm ./projet/*.lzma ./projet/*.xz ./projet/*.bz2 ./projet/*ZIP* ./projet/*HUFF*
+rm ./projet/*.lzma ./projet/*.xz ./projet/*.bz2 ./projet/*ZIP* ./projet/*HUFF* ./projet/*BZ* ./projet/*LZ* ./projet/*XZ* 
