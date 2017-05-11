@@ -15,7 +15,7 @@ MyLZMA=$({ time lzma -z ./projet/$1.LZ; } 2>&1 | grep real| sed -e 's/real\t//'|
 MyXZ=$({ time xz -z ./projet/$1.XZ; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyBZIP2=$({ time  bzip2 -z ./projet/$1.BZ; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyZIP=$({ time  zip -q -r ./projet/$1.ZIP.zip ./projet/$1.ZIP; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
-MyHUFF=$({ time ./huffman-extern/huffcode -c -i ./projet/$i.HUFF -o ./projet/$1.HUFF.huff; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
+MyHUFF=$({ time ./huffman-extern/huffcode -c -i ./projet/$1.HUFF -o ./projet/$1.HUFF.huff; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 
 LZMA=$(./comp.py $MyLZMA)
 XZ=$(./comp.py $MyXZ)
@@ -36,7 +36,7 @@ MyunLZMA=$({ time lzma -d ./projet/$1.LZ.lzma; } 2>&1 | grep real| sed -e 's/rea
 MyunXZ=$({ time xz -d ./projet/$1.XZ.xz; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyunBZIP2=$({ time  bzip2 -d ./projet/$1.BZ.bz2; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 MyunZIP=$({ time  zip -r ./projet/$1.ZIP ./projet/$1.ZIP.zip; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
-MyunHUFF=$({ time ./huffman-extern/huffcode -c -i ./projet/$i.HUFF -o ./projet/$1.HUFF.huff; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
+MyunHUFF=$({ time ./huffman-extern/huffcode -d -i ./projet/$1.HUFF.huff -o ./projet/$1.HUFF.huffd; } 2>&1 | grep real| sed -e 's/real\t//'| sed -e 's/s//')
 
 LZMA=$(./comp.py $MyunLZMA)
 XZ=$(./comp.py $MyunXZ)
@@ -53,8 +53,8 @@ echo "\begin{axis}[ybar,xticklabels={0,0,lzma,xz,zip,bzip2,huffman}]"
 echo "\addplot coordinates{(1,"$LZMA")(2,"$XZ")(4,"$BZIP2")(3,"$ZIP")(5,"$HUFF")};"
 echo "\end{axis}"
 echo "\end{tikzpicture}"
-echo "temps de compression et de decompression de "$1"en secondes "
+echo "\\\\ temps de compression et de decompression de "$1" en secondes "
 echo "\end{document}"
 
 
-rm ./projet/*.lzma ./projet/*.xz ./projet/*.bz2 ./projet/*ZIP* ./projet/*HUFF* ./projet/*BZ* ./projet/*LZ* ./projet/*XZ* 
+# rm ./projet/*.lzma ./projet/*.xz ./projet/*.bz2 ./projet/*ZIP* ./projet/*HUFF* ./projet/*BZ* ./projet/*LZ* ./projet/*XZ* 
