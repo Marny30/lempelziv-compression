@@ -53,12 +53,12 @@ class App():
         c = CompressionApp()
 
     def lz77(self):
-        print("TODO: lz77")
-        pass
+        import webbrowser
+        webbrowser.open('lempelziv/lz77.pdf')
 
     def famille(self):
         import webbrowser
-        webbrowser.open('exo-open lempelziv/famille/famille.png')
+        webbrowser.open('lempelziv/famille/famille.png')
     
     def comparaison(self):
         print("TODO: Comparison")
