@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import lz78explained
+import lz78
 
 HEADER = False
 FOOTER = False
@@ -28,6 +28,7 @@ def draw(rawdata, code, dico, nbnode=-1):
     res = 'digraph trie {rankdir="TB";'
     lowestNode = [0,0] # i, profondeur
     stepbystep = True
+    print("dico:"  +str(dico))
     if nbnode==-1:
         nbnode = len(code)
         stepbystep = False
@@ -37,11 +38,9 @@ def draw(rawdata, code, dico, nbnode=-1):
     
     if HEADER:
         res += 'subgraph clusterheader{margin=0;style="invis" '
-        # couleur partielle : 
-        # <<font> <font color="green">middle aaa</font> aaaa </font>>
         if stepbystep:
             # si pas premiere fois
-            print(str(NBLETTER) , str(newletters), str(len(rawdata)))
+            # print(str(NBLETTER) , str(newletters), str(len(rawdata)))
             if NBLETTER < len(rawdata):
                 toEncode = '<font color="grey30">' + rawdata[NBLETTER:] + '</font>'
             else:
@@ -87,26 +86,22 @@ def draw(rawdata, code, dico, nbnode=-1):
 def dotToPS(inputList, output, cd='.'):
     import os
     os.system('dot -Tps '+ ' '.join(inputList) +' >' + output)
-    print(inputList)
-    os.system('rm '+ ' '.join(inputList))
+    # print(inputList)
+    for i in inputList:
+        os.remove(i)
 
-def stepbyStepWrapper(raw, output):
-    code, dico = lz78explained.encode(raw)
+def stepbyStepWrapper(raw, code, dico, output):
     inputs = list()
     for i in range(len(code)):
         current_file = 'tmp_'+str(i)+'.gv'
         graph = draw(raw, code, dico, i)
         inputs.append(current_file)
-
         with open(current_file, 'w') as f:
             f.write(graph)
-
-    dotToPS(inputs, output+".ps")
+    dotToPS(inputs, output)
             
 if __name__ == '__main__':
     import argparse
-    # global HEADER
-    # global FOOTER
     cpt = -1
     p = argparse.ArgumentParser(description="Genère des Trie de  Lempel Ziv 78 Trie depuis l'entrée choisie", prog="trie.py")
     p.add_argument('-o', metavar='output', dest='output',  type=str , help='nom de la sortie')
@@ -131,13 +126,14 @@ if __name__ == '__main__':
     elif args.print:
         output = args.input + '.gv'
     else:
-        output = args.input
+        output = args.input + '.ps'
         
-    code, dico = lz78explained.encode(raw)
+    code, dico = lz78.encode(raw)
+    print(code)
     if args.isStepByStep:
-        stepbyStepWrapper(raw, output)
+        stepbyStepWrapper(raw, code, dico, output)
     else:
-        graph = draw(raw, code, dico)
+        graph = draw(raw, dico, code)
         if args.print:
             with open(output, 'w') as f:
                 f.write(graph)
@@ -146,4 +142,4 @@ if __name__ == '__main__':
             with open('tmp.gv', 'w') as f:
                 f.write(graph)
             # générer le graphe
-            dotToPS(['tmp.gv'], output+'.ps')
+            dotToPS(['tmp.gv'], output)
