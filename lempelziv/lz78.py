@@ -155,6 +155,8 @@ if __name__ == '__main__':
         output="out" +suffix
     elif args.decode and args.input[-5:]=='.lz78':
         output = args.input[:-5]
+    else:
+        output = args.input + '.lz78'
         
     if args.isString:
         rawdata = args.input
