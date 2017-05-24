@@ -36,8 +36,40 @@ class SaisieApp():
 
 class HuffApp(SaisieApp):
     def draw(self):
-        pass
+        import subprocess
+        import os
+        import webbrowser
+        
+        text = self.e1.get()
+        path = self.e2.get()
+        prog='./huffman_graph/huffman'
+        tmpfile = './huffman_graph/tmp.txt'
+        dotfile = './huffman_graph/tmp.dot'
+        output = './huffman_graph/output.ps'
+        if text:
+            data = text
+            filename = tmpfile
+            with open(tmpfile, 'w') as f:
+                f.write(text)
+        elif path:
+            filename = path
+        else:
+            return
 
+        with open(dotfile, 'w') as f:
+            txt = subprocess.Popen([prog, '-g', filename],
+                                       stdout=subprocess.PIPE).stdout.read()
+            f.write(txt.decode('latin-1'))
+        with open(output, 'w') as f:
+            txt = subprocess.Popen(['dot',str('-Tps'),dotfile],
+                                  stdout=subprocess.PIPE).stdout.read()
+            f.write(txt.decode('latin-1'))
+        
+        if filename != path:    # si saisie de texte
+            os.remove(tmpfile)
+        os.remove(dotfile)
+        webbrowser.open(output)
+        
 class TrieApp(SaisieApp):
     def __init__(self):
         super().__init__(title="Génération de Trie de Lempel Ziv")
@@ -49,7 +81,7 @@ class TrieApp(SaisieApp):
         import lempelziv.lz78 as lz78
         import tkinter.messagebox
         import os
-        
+        import webbrowser
         text = self.e1.get()
         path = self.e2.get()
         filename='lz78graph.ps'
@@ -77,7 +109,7 @@ class TrieApp(SaisieApp):
             with open('tmp.dot', 'w') as f:
                 f.write(graph)
             trie.dotToPS(['tmp.dot'], filename)
-        os.system('exo-open '+ filename)
+        webbrowser.open(filename)
 
 
 class CompressionApp(SaisieApp):

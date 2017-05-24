@@ -35,7 +35,6 @@ class App():
         
     def huffman(self):
         h = HuffApp()
-        print("TODO: HUFF APP")
     
     def lempelziv(self):
         self.frame.destroy()
@@ -54,16 +53,16 @@ class App():
         c = CompressionApp()
 
     def lz77(self):
-        print("TODO: lz77")
-        pass
+        import webbrowser
+        webbrowser.open('lempelziv/lz77.pdf')
 
     def famille(self):
-        import os
-        os.system('exo-open lempelziv/famille/famille.png')
+        import webbrowser
+        webbrowser.open('lempelziv/famille/famille.png')
     
     def comparaison(self):
-        print("TODO: Comparison")
-        pass
+        import webbrowser
+        webbrowser.open('comp/final.pdf')
     
 def main():
     root = Tk()
